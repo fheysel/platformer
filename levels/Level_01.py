@@ -1,5 +1,6 @@
 from Level import Level
 from Platform import Platform, MovingPlatform
+from Enemy import Enemy
 
 
 class Level_01(Level):
@@ -38,3 +39,15 @@ class Level_01(Level):
         block.player = self.player
         block.level = self
         self.platform_list.add(block)
+
+        # Add a custom enemy
+        enemy =  Enemy(30, 30)
+        enemy.rect.x = 900
+        enemy.rect.y = 300
+        enemy.boundary_left = 800
+        enemy.boundary_right = 1000
+        enemy.change_x = 1
+        enemy.player = self.player
+        enemy.level = self
+        self.enemy_list.add(enemy)
+

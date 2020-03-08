@@ -20,7 +20,7 @@ class Player(pygame.sprite.Sprite):
         width = 40
         height = 60
         self.image = pygame.Surface([width, height])
-        self.image.fill(RED)
+        self.image.fill(BLACK)
  
         # Set a referance to the image rect.
         self.rect = self.image.get_rect()
@@ -50,6 +50,11 @@ class Player(pygame.sprite.Sprite):
             elif self.change_x < 0:
                 # Otherwise if we are moving left, do the opposite.
                 self.rect.left = block.rect.right
+        
+        enemy_hit_list = pygame.sprite.spritecollide(self, self.level.enemy_list, False)
+        if len(enemy_hit_list) > 0:
+            # restart level
+            self.rect.x = 120
  
         # Move up/down
         self.rect.y += self.change_y
