@@ -1,6 +1,10 @@
 from Level import Level
 from Platform import Platform, MovingPlatform
 from Enemy import Enemy
+ 
+ 
+BLOCK_WIDTH = 210 
+BLOCK_HEIGHT = 70
 
 
 class Level_01(Level):
@@ -12,13 +16,24 @@ class Level_01(Level):
         # Call the parent constructor
         Level.__init__(self, player)
  
-        self.level_limit = -1500
- 
+        self.level_limit = -6000
+        BLOCK_WIDTH = 210
+        self.block_height = 70
         # Array with width, height, x, and y of platform
-        level = [[210, 70, 500, 500],
-                 [210, 70, 800, 400],
-                 [210, 70, 1000, 500],
-                 [210, 70, 1120, 280],
+        level = [[BLOCK_WIDTH, BLOCK_HEIGHT, 500, 500],
+                 [BLOCK_WIDTH, BLOCK_HEIGHT, 800, 400],
+                 [BLOCK_WIDTH, BLOCK_HEIGHT, 1000, 500],
+                 [BLOCK_WIDTH, BLOCK_HEIGHT, 1120, 280],
+                 [BLOCK_WIDTH, BLOCK_HEIGHT, 1500, 280],
+                 [BLOCK_WIDTH, BLOCK_HEIGHT, 2000, 280],
+                 [BLOCK_WIDTH, BLOCK_HEIGHT, 2500, 280],
+                 [BLOCK_WIDTH, BLOCK_HEIGHT, 3000, 280],
+                 [BLOCK_WIDTH, BLOCK_HEIGHT, 3500, 280],
+                 [BLOCK_WIDTH, BLOCK_HEIGHT, 4000, 280],
+                 [BLOCK_WIDTH, BLOCK_HEIGHT, 4500, 280],
+                 [BLOCK_WIDTH, BLOCK_HEIGHT, 5000, 280],
+                 [BLOCK_WIDTH, BLOCK_HEIGHT, 5500, 280],
+                 [BLOCK_WIDTH, BLOCK_HEIGHT, 60000, 280],
                  ]
  
         # Go through the array above and add platforms

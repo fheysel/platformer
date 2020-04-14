@@ -31,7 +31,11 @@ class Player(pygame.sprite.Sprite):
  
         # List of sprites we can bump against
         self.level = None
- 
+
+        # Bools to store whether a second jump or boost is available
+        self.double_jump = True
+        self.boostable = True
+
     def update(self):
         """ Move the player. """
         # Gravity
@@ -40,7 +44,7 @@ class Player(pygame.sprite.Sprite):
         # Move left/right
         self.rect.x += self.change_x
  
-        # See if we hit anything
+        # See if we hit a block
         block_hit_list = pygame.sprite.spritecollide(self, self.level.platform_list, False)
         for block in block_hit_list:
             # If we are moving right,
@@ -51,10 +55,11 @@ class Player(pygame.sprite.Sprite):
                 # Otherwise if we are moving left, do the opposite.
                 self.rect.left = block.rect.right
         
+        # See if we hit an enemy
         enemy_hit_list = pygame.sprite.spritecollide(self, self.level.enemy_list, False)
         if len(enemy_hit_list) > 0:
             # restart level
-            self.rect.x = 120
+            return 1
  
         # Move up/down
         self.rect.y += self.change_y
@@ -65,6 +70,7 @@ class Player(pygame.sprite.Sprite):
  
             # Reset our position based on the top/bottom of the object.
             if self.change_y > 0:
+                self.double_jump = True
                 self.rect.bottom = block.rect.top
             elif self.change_y < 0:
                 self.rect.top = block.rect.bottom
@@ -84,6 +90,7 @@ class Player(pygame.sprite.Sprite):
  
         # See if we are on the ground.
         if self.rect.y >= SCREEN_HEIGHT - self.rect.height and self.change_y >= 0:
+            self.double_jump = True
             self.change_y = 0
             self.rect.y = SCREEN_HEIGHT - self.rect.height
  
@@ -98,8 +105,38 @@ class Player(pygame.sprite.Sprite):
         self.rect.y -= 2
  
         # If it is ok to jump, set our speed upwards
-        if len(platform_hit_list) > 0 or self.rect.bottom >= SCREEN_HEIGHT:
+        if (len(platform_hit_list) > 0 or self.rect.bottom >= SCREEN_HEIGHT):
             self.change_y = -10
+        elif self.double_jump == True:
+            self.double_jump = False
+            self.change_y = -10
+
+    def boost(self, left, right):
+        """ Called when the user hits 'boost' button. """
+        if left and right:
+            return
+        if left:
+            self.change_x = -10
+        if right:
+            self.change_x = 10
+        if not(left or right):
+            return
+        
+        # # check if boost results in a collision
+        # self.rect_x = 10 * direction
+        # platform_hit_list = pygame.sprite.spritecollide(self, self.level.platform_hit_list, False)
+        # self.rect_x = -10 * direction
+
+        # # handle collision
+        # if (len(platform_hit_list) > 0):
+        #     # if left set player's left side to the platform's right
+        #     if direction == -1: 
+
+
+
+
+        
+
  
     # Player-controlled movement:
     def go_left(self):
