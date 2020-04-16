@@ -3,6 +3,11 @@ from constants import *
 from Platform import MovingPlatform
 
 
+def direction(x):
+    if x == 0:
+        return 0
+    return x / abs(x)
+
 class Player(pygame.sprite.Sprite):
     """
     This class represents the bar at the bottom that the player controls.
@@ -34,14 +39,17 @@ class Player(pygame.sprite.Sprite):
 
         # Bools to store whether a second jump or boost is available
         self.double_jump = True
+
+        # The player's ability to boost and how much time remains in the boost
         self.boostable = True
+        self.boost_level = 0
 
     def update(self):
         """ Move the player. """
         # Gravity
         self.calc_grav()
  
-        # Move left/right
+        # MOVE LEFT/RIGHT
         self.rect.x += self.change_x
  
         # See if we hit a block
@@ -61,7 +69,7 @@ class Player(pygame.sprite.Sprite):
             # restart level
             return 1
  
-        # Move up/down
+        # MOVE UP DOWN
         self.rect.y += self.change_y
  
         # Check and see if we hit anything
@@ -78,9 +86,20 @@ class Player(pygame.sprite.Sprite):
             # Stop our vertical movement
             self.change_y = 0
  
+            # Move moving blocks
             if isinstance(block, MovingPlatform):
                 self.rect.x += block.change_x
  
+        if self.boost_level > 0:
+            # while boosting, decrease the amount of boost remaining
+            self.boost_level -= 1
+        else:
+            if self.boostable is False:
+                # when boost runs out reset speed and boostable flag
+                self.boostable = True
+                self.change_x = direction(self.change_x) * PLAYER_SPEED
+
+
     def calc_grav(self):
         """ Calculate effect of gravity. """
         if self.change_y == 0:
@@ -113,15 +132,20 @@ class Player(pygame.sprite.Sprite):
 
     def boost(self, left, right):
         """ Called when the user hits 'boost' button. """
-        if left and right:
+        if self.change_x == 0: # If not already moving dont boost
+            return 
+
+        if self.boostable == True and self.boost_level <= 0:
+            self.boostable = False 
+            self.boost_level = 10
+        else:
             return
-        if left:
-            self.change_x = -10
-        if right:
-            self.change_x = 10
-        if not(left or right):
-            return
-        
+
+        direction = self.change_x / abs(self.change_x) 
+        self.change_x = direction * PLAYER_SPEED * 2
+
+       
+
         # # check if boost results in a collision
         # self.rect_x = 10 * direction
         # platform_hit_list = pygame.sprite.spritecollide(self, self.level.platform_hit_list, False)
@@ -132,20 +156,15 @@ class Player(pygame.sprite.Sprite):
         #     # if left set player's left side to the platform's right
         #     if direction == -1: 
 
-
-
-
-        
-
  
     # Player-controlled movement:
     def go_left(self):
         """ Called when the user hits the left arrow. """
-        self.change_x = -6
+        self.change_x = -PLAYER_SPEED
  
     def go_right(self):
         """ Called when the user hits the right arrow. """
-        self.change_x = 6
+        self.change_x = PLAYER_SPEED
  
     def stop(self):
         """ Called when the user lets off the keyboard. """

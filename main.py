@@ -78,12 +78,11 @@ def main():
                     right_down = True
                     player.go_right() 
                 if event.key == pygame.K_SPACE:
-                    print('jump')
                     player.jump()
                 if event.key == pygame.K_LSHIFT:
-                    print('shift')
-                    player.boostable = False
                     player.boost(left_down, right_down)
+                        
+                    
  
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT and player.change_x < 0:
@@ -92,9 +91,6 @@ def main():
                 if event.key == pygame.K_RIGHT and player.change_x > 0:
                     right_down = False
                     player.stop()
-                if event.key == pygame.K_LSHIFT:
-                    print('shift')
-                    player.boostable = True
  
         # Update the player.
         active_sprite_list.update()

@@ -1,5 +1,6 @@
 # Global constants
- 
+PLAYER_SPEED = 6
+
 # Colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
