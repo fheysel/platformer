@@ -58,10 +58,6 @@ def main():
  
     # Used to manage how fast the screen updates
     clock = pygame.time.Clock()
-    
-    # keep track of what keys are being pressed
-    left_down = False
-    right_down = False
  
     # -------- Main Program Loop -----------
     while not done:
@@ -72,24 +68,18 @@ def main():
             # KEYBOARD INTERRUPTS
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT: 
-                    left_down = True
                     player.go_left()
                 if event.key == pygame.K_RIGHT:
-                    right_down = True
                     player.go_right() 
                 if event.key == pygame.K_SPACE:
                     player.jump()
                 if event.key == pygame.K_LSHIFT:
-                    player.boost(left_down, right_down)
-                        
-                    
+                    player.boost()
  
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT and player.change_x < 0:
-                    left_down = False
                     player.stop()
                 if event.key == pygame.K_RIGHT and player.change_x > 0:
-                    right_down = False
                     player.stop()
  
         # Update the player.

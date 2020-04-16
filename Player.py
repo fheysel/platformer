@@ -99,7 +99,6 @@ class Player(pygame.sprite.Sprite):
                 self.boostable = True
                 self.change_x = direction(self.change_x) * PLAYER_SPEED
 
-
     def calc_grav(self):
         """ Calculate effect of gravity. """
         if self.change_y == 0:
@@ -113,50 +112,6 @@ class Player(pygame.sprite.Sprite):
             self.change_y = 0
             self.rect.y = SCREEN_HEIGHT - self.rect.height
  
-    def jump(self):
-        """ Called when user hits 'jump' button. """
- 
-        # move down a bit and see if there is a platform below us.
-        # Move down 2 pixels because it doesn't work well if we only move down
-        # 1 when working with a platform moving down.
-        self.rect.y += 2
-        platform_hit_list = pygame.sprite.spritecollide(self, self.level.platform_list, False)
-        self.rect.y -= 2
- 
-        # If it is ok to jump, set our speed upwards
-        if (len(platform_hit_list) > 0 or self.rect.bottom >= SCREEN_HEIGHT):
-            self.change_y = -10
-        elif self.double_jump == True:
-            self.double_jump = False
-            self.change_y = -10
-
-    def boost(self, left, right):
-        """ Called when the user hits 'boost' button. """
-        if self.change_x == 0: # If not already moving dont boost
-            return 
-
-        if self.boostable == True and self.boost_level <= 0:
-            self.boostable = False 
-            self.boost_level = 10
-        else:
-            return
-
-        direction = self.change_x / abs(self.change_x) 
-        self.change_x = direction * PLAYER_SPEED * 2
-
-       
-
-        # # check if boost results in a collision
-        # self.rect_x = 10 * direction
-        # platform_hit_list = pygame.sprite.spritecollide(self, self.level.platform_hit_list, False)
-        # self.rect_x = -10 * direction
-
-        # # handle collision
-        # if (len(platform_hit_list) > 0):
-        #     # if left set player's left side to the platform's right
-        #     if direction == -1: 
-
- 
     # Player-controlled movement:
     def go_left(self):
         """ Called when the user hits the left arrow. """
@@ -169,3 +124,34 @@ class Player(pygame.sprite.Sprite):
     def stop(self):
         """ Called when the user lets off the keyboard. """
         self.change_x = 0
+
+    def jump(self):
+        """ Called when user hits 'jump' button. """
+ 
+        # move down a bit and see if there is a platform below us.
+        # Move down 2 pixels because it doesn't work well if we only move down
+        # 1 when working with a platform moving down.
+        self.rect.y += 2
+        platform_hit_list = pygame.sprite.spritecollide(self, self.level.platform_list, False)
+        self.rect.y -= 2
+ 
+        # If it on ground or if double jump hasnt been used, set Players speed upwards
+        if (len(platform_hit_list) > 0 or self.rect.bottom >= SCREEN_HEIGHT):
+            self.change_y = -10
+        elif self.double_jump == True:
+            self.double_jump = False
+            self.change_y = -10
+
+    def boost(self):
+        """ Called when the user hits 'boost' button. """
+        if self.change_x == 0: # If not already moving dont boost
+            return 
+
+        if self.boostable == True and self.boost_level <= 0:
+            self.boostable = False 
+            self.boost_level = 10
+        else:
+            return
+
+        direction = self.change_x / abs(self.change_x) 
+        self.change_x = direction * PLAYER_SPEED * 2
