@@ -64,14 +64,17 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
- 
+
+            # KEYBOARD INTERRUPTS
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
+                if event.key == pygame.K_LEFT: 
                     player.go_left()
                 if event.key == pygame.K_RIGHT:
-                    player.go_right()
-                if event.key == pygame.K_UP:
+                    player.go_right() 
+                if event.key == pygame.K_SPACE:
                     player.jump()
+                if event.key == pygame.K_LSHIFT:
+                    player.boost()
  
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT and player.change_x < 0:

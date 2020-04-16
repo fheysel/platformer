@@ -3,6 +3,11 @@ from constants import *
 from Platform import MovingPlatform
 
 
+def direction(x):
+    if x == 0:
+        return 0
+    return x / abs(x)
+
 class Player(pygame.sprite.Sprite):
     """
     This class represents the bar at the bottom that the player controls.
@@ -31,16 +36,23 @@ class Player(pygame.sprite.Sprite):
  
         # List of sprites we can bump against
         self.level = None
- 
+
+        # Bools to store whether a second jump or boost is available
+        self.double_jump = True
+
+        # The player's ability to boost and how much time remains in the boost
+        self.boostable = True
+        self.boost_level = 0
+
     def update(self):
         """ Move the player. """
         # Gravity
         self.calc_grav()
  
-        # Move left/right
+        # MOVE LEFT/RIGHT
         self.rect.x += self.change_x
  
-        # See if we hit anything
+        # See if we hit a block
         block_hit_list = pygame.sprite.spritecollide(self, self.level.platform_list, False)
         for block in block_hit_list:
             # If we are moving right,
@@ -51,12 +63,13 @@ class Player(pygame.sprite.Sprite):
                 # Otherwise if we are moving left, do the opposite.
                 self.rect.left = block.rect.right
         
+        # See if we hit an enemy
         enemy_hit_list = pygame.sprite.spritecollide(self, self.level.enemy_list, False)
         if len(enemy_hit_list) > 0:
             # restart level
-            self.rect.x = 120
+            return 1
  
-        # Move up/down
+        # MOVE UP DOWN
         self.rect.y += self.change_y
  
         # Check and see if we hit anything
@@ -65,6 +78,7 @@ class Player(pygame.sprite.Sprite):
  
             # Reset our position based on the top/bottom of the object.
             if self.change_y > 0:
+                self.double_jump = True
                 self.rect.bottom = block.rect.top
             elif self.change_y < 0:
                 self.rect.top = block.rect.bottom
@@ -72,9 +86,19 @@ class Player(pygame.sprite.Sprite):
             # Stop our vertical movement
             self.change_y = 0
  
+            # Move moving blocks
             if isinstance(block, MovingPlatform):
                 self.rect.x += block.change_x
  
+        if self.boost_level > 0:
+            # while boosting, decrease the amount of boost remaining
+            self.boost_level -= 1
+        else:
+            if self.boostable is False:
+                # when boost runs out reset speed and boostable flag
+                self.boostable = True
+                self.change_x = direction(self.change_x) * PLAYER_SPEED
+
     def calc_grav(self):
         """ Calculate effect of gravity. """
         if self.change_y == 0:
@@ -84,9 +108,23 @@ class Player(pygame.sprite.Sprite):
  
         # See if we are on the ground.
         if self.rect.y >= SCREEN_HEIGHT - self.rect.height and self.change_y >= 0:
+            self.double_jump = True
             self.change_y = 0
             self.rect.y = SCREEN_HEIGHT - self.rect.height
  
+    # Player-controlled movement:
+    def go_left(self):
+        """ Called when the user hits the left arrow. """
+        self.change_x = -PLAYER_SPEED
+ 
+    def go_right(self):
+        """ Called when the user hits the right arrow. """
+        self.change_x = PLAYER_SPEED
+ 
+    def stop(self):
+        """ Called when the user lets off the keyboard. """
+        self.change_x = 0
+
     def jump(self):
         """ Called when user hits 'jump' button. """
  
@@ -97,19 +135,23 @@ class Player(pygame.sprite.Sprite):
         platform_hit_list = pygame.sprite.spritecollide(self, self.level.platform_list, False)
         self.rect.y -= 2
  
-        # If it is ok to jump, set our speed upwards
-        if len(platform_hit_list) > 0 or self.rect.bottom >= SCREEN_HEIGHT:
+        # If it on ground or if double jump hasnt been used, set Players speed upwards
+        if (len(platform_hit_list) > 0 or self.rect.bottom >= SCREEN_HEIGHT):
             self.change_y = -10
- 
-    # Player-controlled movement:
-    def go_left(self):
-        """ Called when the user hits the left arrow. """
-        self.change_x = -6
- 
-    def go_right(self):
-        """ Called when the user hits the right arrow. """
-        self.change_x = 6
- 
-    def stop(self):
-        """ Called when the user lets off the keyboard. """
-        self.change_x = 0
+        elif self.double_jump == True:
+            self.double_jump = False
+            self.change_y = -10
+
+    def boost(self):
+        """ Called when the user hits 'boost' button. """
+        if self.change_x == 0: # If not already moving dont boost
+            return 
+
+        if self.boostable == True and self.boost_level <= 0:
+            self.boostable = False 
+            self.boost_level = 10
+        else:
+            return
+
+        direction = self.change_x / abs(self.change_x) 
+        self.change_x = direction * PLAYER_SPEED * 2
