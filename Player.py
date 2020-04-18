@@ -3,11 +3,6 @@ from constants import *
 from Platform import MovingPlatform
 
 
-def direction(x):
-    if x == 0:
-        return 0
-    return x / abs(x)
-
 class Player(pygame.sprite.Sprite):
     """
     This class represents the bar at the bottom that the player controls.
@@ -36,6 +31,9 @@ class Player(pygame.sprite.Sprite):
  
         # List of sprites we can bump against
         self.level = None
+
+        # Set players health
+        self.health = 10
 
         # Bools to store whether a second jump or boost is available
         self.double_jump = True
@@ -67,7 +65,9 @@ class Player(pygame.sprite.Sprite):
         enemy_hit_list = pygame.sprite.spritecollide(self, self.level.enemy_list, False)
         if len(enemy_hit_list) > 0:
             # restart level
-            return 1
+            self.health -= 1
+            if self.health <= 0:
+                return 1
  
         # MOVE UP DOWN
         self.rect.y += self.change_y
@@ -155,3 +155,10 @@ class Player(pygame.sprite.Sprite):
 
         direction = self.change_x / abs(self.change_x) 
         self.change_x = direction * PLAYER_SPEED * 2
+
+
+# Helper functions
+def direction(x):
+    if x == 0:
+        return 0
+    return x / abs(x)
