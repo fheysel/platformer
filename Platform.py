@@ -41,7 +41,7 @@ class MovingPlatform(Platform):
  
         # Move left/right
         self.rect.x += self.change_x
- 
+
         # See if we hit the player
         hit = pygame.sprite.collide_rect(self, self.player)
         if hit:

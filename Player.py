@@ -1,6 +1,6 @@
 import pygame
 from constants import *
-from Platform import MovingPlatform
+from Platform import Platform, MovingPlatform
 
 
 class Player(pygame.sprite.Sprite):
@@ -29,11 +29,12 @@ class Player(pygame.sprite.Sprite):
         self.change_x = 0
         self.change_y = 0
  
-        # List of sprites we can bump against
+        # Level player is in
         self.level = None
 
         # Set players health
-        self.health = 10
+        self.health = 3
+        self.safe_time = 0
 
         # Bools to store whether a second jump or boost is available
         self.double_jump = True
@@ -46,58 +47,88 @@ class Player(pygame.sprite.Sprite):
         """ Move the player. """
         # Gravity
         self.calc_grav()
- 
-        # MOVE LEFT/RIGHT
+
+        # Decrease safe time
+        self.safe_time -= 1
+
+        ### Horizontal Movement
         self.rect.x += self.change_x
  
-        # See if we hit a block
+        # Horizontal object collision
         block_hit_list = pygame.sprite.spritecollide(self, self.level.platform_list, False)
         for block in block_hit_list:
-            # If we are moving right,
-            # set our right side to the left side of the item we hit
-            if self.change_x > 0:
-                self.rect.right = block.rect.left
-            elif self.change_x < 0:
-                # Otherwise if we are moving left, do the opposite.
-                self.rect.left = block.rect.right
-        
-        # See if we hit an enemy
+            self.avoid_object_x(block)
+
+        # Horizontal enemy collision
         enemy_hit_list = pygame.sprite.spritecollide(self, self.level.enemy_list, False)
-        if len(enemy_hit_list) > 0:
-            # restart level
-            self.health -= 1
-            if self.health <= 0:
-                return 1
- 
-        # MOVE UP DOWN
+        if self.safe_time < 0:
+            if len(enemy_hit_list) > 0:
+                self.safe_time = 100
+            for enemy in enemy_hit_list:
+                self.health -= 1
+                #  self.avoid_object_x(enemy)
+        else:
+            # TODO Flash character sprite
+            pass
+
+        ### Verticle Movement
         self.rect.y += self.change_y
  
-        # Check and see if we hit anything
+        # Verticle object collision
         block_hit_list = pygame.sprite.spritecollide(self, self.level.platform_list, False)
         for block in block_hit_list:
- 
-            # Reset our position based on the top/bottom of the object.
-            if self.change_y > 0:
-                self.double_jump = True
-                self.rect.bottom = block.rect.top
-            elif self.change_y < 0:
-                self.rect.top = block.rect.bottom
- 
-            # Stop our vertical movement
+            self.avoid_object_y(block)
             self.change_y = 0
  
-            # Move moving blocks
-            if isinstance(block, MovingPlatform):
+            # Move with moving blocks
+            if isinstance(block, MovingPlatform): 
                 self.rect.x += block.change_x
+        
+        # Verticle enemy collision
+        enemy_hit_list = pygame.sprite.spritecollide(self, self.level.enemy_list, False)
+        if self.safe_time < 0:
+            if len(enemy_hit_list) > 0:
+                self.safe_time = 300
+            for enemy in enemy_hit_list:
+                self.health -= 1
+                #  self.avoid_object_y(enemy)
+        
  
+        # If dead restart level
+        if self.health <= 0:
+            print("DIE MOTHER FUCKERRRRR") 
+            self.safe_time = -1
+            self.double_jump = True
+            self.boostable = True
+            self.boost_level = 0
+            return  
+        
         if self.boost_level > 0:
-            # while boosting, decrease the amount of boost remaining
             self.boost_level -= 1
         else:
             if self.boostable is False:
                 # when boost runs out reset speed and boostable flag
                 self.boostable = True
                 self.change_x = direction(self.change_x) * PLAYER_SPEED
+        
+
+    def avoid_object_x(self, obj):
+        # If we are moving right,
+        # set our right side to the left side of the item we hit
+        if self.change_x > 0:
+            self.rect.right = obj.rect.left
+        elif self.change_x < 0:
+            # Otherwise if we are moving left, do the opposite.
+            self.rect.left = obj.rect.right
+
+    def avoid_object_y(self, obj):
+        # Reset our position based on the top/bottom of the object.
+        if self.change_y > 0:
+            self.rect.bottom = obj.rect.top
+            if isinstance(obj, Platform): 
+                self.double_jump = True
+        elif self.change_y < 0:
+            self.rect.top = obj.rect.bottom
 
     def calc_grav(self):
         """ Calculate effect of gravity. """
@@ -111,6 +142,11 @@ class Player(pygame.sprite.Sprite):
             self.double_jump = True
             self.change_y = 0
             self.rect.y = SCREEN_HEIGHT - self.rect.height
+
+    # def restart_level(self):
+    #     self.health = 3
+    #     self.rect.x = self.level.level_start[0]
+    #     self.rect.y = self.level.level_start[1]
  
     # Player-controlled movement:
     def go_left(self):

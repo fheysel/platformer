@@ -1,3 +1,4 @@
+from constants import SCREEN_HEIGHT
 from Level import Level
 from Platform import Platform, MovingPlatform
 
@@ -10,8 +11,9 @@ class Level_02(Level):
  
         # Call the parent constructor
         Level.__init__(self, player)
- 
-        self.level_limit = -1000
+
+        self.level_start = [340, SCREEN_HEIGHT - player.rect.height]
+        self.level_end = [-1000, SCREEN_HEIGHT - player.rect.height]
  
         # Array with type of platform, and x, y location of the platform.
         level = [[210, 70, 500, 550],

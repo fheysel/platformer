@@ -19,7 +19,8 @@ class Level(object):
      
         # How far this world has been scrolled left/right
         self.world_shift = 0
-        self.level_limit = -1000
+        self.level_start = [340, 0]
+        self.level_end = [-1000, 0]
  
     # Update everythign on this level
     def update(self):

@@ -1,6 +1,8 @@
+from constants import SCREEN_HEIGHT
+from Enemy import Enemy
 from Level import Level
 from Platform import Platform, MovingPlatform
-from Enemy import Enemy
+
  
  
 BLOCK_WIDTH = 210 
@@ -15,16 +17,15 @@ class Level_01(Level):
  
         # Call the parent constructor
         Level.__init__(self, player)
- 
-        self.level_limit = -6000
-        BLOCK_WIDTH = 210
-        self.block_height = 70
+        
+        self.level_start = [340, SCREEN_HEIGHT - player.rect.height]
+        self.level_end = [-6000, SCREEN_HEIGHT - player.rect.height]
+        
         # Array with width, height, x, and y of platform
         level = [[BLOCK_WIDTH, BLOCK_HEIGHT, 500, 500],
                  [BLOCK_WIDTH, BLOCK_HEIGHT, 800, 400],
                  [BLOCK_WIDTH, BLOCK_HEIGHT, 1000, 500],
                  [BLOCK_WIDTH, BLOCK_HEIGHT, 1120, 280],
-                 [BLOCK_WIDTH, BLOCK_HEIGHT, 1500, 280],
                  [BLOCK_WIDTH, BLOCK_HEIGHT, 2000, 280],
                  [BLOCK_WIDTH, BLOCK_HEIGHT, 2500, 280],
                  [BLOCK_WIDTH, BLOCK_HEIGHT, 3000, 280],

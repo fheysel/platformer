@@ -36,11 +36,8 @@ class Enemy(pygame.sprite.Sprite):
         self.rect.x += self.change_x
         self.rect.y += self.change_y
  
-        # Check and see if we the player
-        hit = pygame.sprite.collide_rect(self, self.player)
-        if hit:
-            # We did hit the player. Restart the level
-            self.player.rect.x = 120
+        # # Check and see if we the player
+        # hit = pygame.sprite.collide_rect(self, self.player)
  
         # Check the boundaries and see if we need to reverse
         # direction.
